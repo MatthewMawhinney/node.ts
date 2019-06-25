@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import program from 'commander';
-import create from '../lib/create';
+import bootstrap from '../lib/create';
 const pckg = require('../../package.json');
 
 program.version(pckg.version);
@@ -12,7 +12,7 @@ program
   .option('-d, --dry-run', 'Do a dry-run of the commands result')
   .description('Create a new node-ts project')
   .action((projectName: string, options) => {
-    create(projectName, options.dryRun);
+    bootstrap(projectName, options.dryRun);
   });
 
 program
@@ -24,7 +24,7 @@ program
   .option('-d --dry-run')
   .description('New Controller/Model/Types')
   .action((itemName: string) => {
-    create(itemName);
+    bootstrap(itemName);
   });
 
 program.parse(process.argv);

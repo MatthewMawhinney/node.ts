@@ -1,7 +1,6 @@
 {
   "defaultSeverity": "error",
   "extends": ["tslint:recommended"],
-
   "jsRules": {},
   "rules": {
     "no-console": false,
@@ -10,7 +9,9 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "trailing-comma": false,
-    "arrow-parens": false
+    "arrow-parens": false,
+    "object-literal-sort-keys": false,
+    "ordered-imports": false
   },
   "rulesDirectory": []
 }
