@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 import program from 'commander';
-import bootstrap from '../lib/create';
+import inquirer from 'inquirer';
+import { bootstrap, inqQuestions } from './lib/create';
 const pckg = require('../../package.json');
 
 program.version(pckg.version);
@@ -9,10 +10,11 @@ program.version(pckg.version);
 program
   .command('create <projectName>')
   .alias('cr')
-  .option('-d, --dry-run', 'Do a dry-run of the commands result')
   .description('Create a new node-ts project')
   .action((projectName: string, options) => {
-    bootstrap(projectName, options.dryRun);
+    inquirer.prompt(inqQuestions).then((answers: any) => {
+      bootstrap(projectName, answers);
+    });
   });
 
 program

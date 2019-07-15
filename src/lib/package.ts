@@ -1,5 +1,12 @@
 import { IPackage, ITSconfig } from '../models/node';
 
+const filesToBuild = [
+  { name: 'package.json', content: buildPackage },
+  { name: 'tslint.json', content: buildLinter },
+  { name: 'tsconfig.json', content: buildConfig },
+  { name: 'jest.config.js', content: buildJest }
+];
+
 function buildPackage(appName: string): IPackage {
   return {
     name: appName,
@@ -14,27 +21,31 @@ function buildPackage(appName: string): IPackage {
   };
 }
 
-function buildConfig(appName: string, config: boolean): any | ITSconfig {
-  if (config) {
-    return {
-      compilerOptions: {
-        target: 'es5',
-        module: 'commonjs',
-        outDir: './dist',
-        strict: true
-      }
-    };
-  } else {
-    return {
-      defaultSeverity: 'error',
-      extends: ['tslint:recommended'],
-      jsRules: {},
-      rules: {
-        quotemark: [true, 'single']
-      },
-      rulesDirectory: []
-    };
-  }
+function buildConfig(appName: string): ITSconfig {
+  return {
+    compilerOptions: {
+      target: 'es5',
+      module: 'commonjs',
+      outDir: './dist',
+      strict: true
+    }
+  };
 }
 
-export { buildPackage, buildConfig };
+function buildLinter(appName: string): any {
+  return {
+    defaultSeverity: 'error',
+    extends: ['tslint:recommended'],
+    jsRules: {},
+    rules: {
+      quotemark: [true, 'single']
+    },
+    rulesDirectory: []
+  };
+}
+
+function buildJest(): any {
+  return {};
+}
+
+export { filesToBuild };
