@@ -10,11 +10,12 @@ export interface IPackage {
   license: string;
 }
 
-export interface ITSconfig {
-  compilerOptions: {};
-}
-
 export interface IBuildFile {
   name: string;
   content: Function;
+}
+
+export interface IPackageAnswers {
+  name: string;
+  description: string;
 }

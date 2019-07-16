@@ -5,6 +5,7 @@ import inquirer from 'inquirer';
 import logSymbols from 'log-symbols';
 import chalk from 'chalk';
 import simplegit from 'simple-git/promise';
+import spawn from 'cross-spawn';
 
 import { bootstrap, inqQuestions } from './lib/create';
 
@@ -14,7 +15,7 @@ const successLog: (message: string) => void = chalk.green.bold;
 program
   .command('create <projectName>')
   .alias('cr')
-  .description('Create a new node-ts project')
+  .description('Create a new node.ts project')
   .action((projectName: string, options) => {
     inquirer.prompt(inqQuestions).then(async (answers: any) => {
       try {
@@ -23,6 +24,10 @@ program
           console.log(
             `${logSymbols.success} ${successLog('CREATED')}: ${resultToConsole}`
           );
+        });
+        spawn.sync('tsc', ['--init'], {
+          stdio: 'inherit',
+          cwd: `./${projectName}`
         });
         let git = simplegit(`./${projectName}`);
         await git
@@ -39,16 +44,16 @@ program
     });
   });
 
-program
-  .command('new <itemName>')
-  .alias('n')
-  .option('-c --controller')
-  .option('-m --model')
-  .option('-t --type')
-  .option('-d --dry-run')
-  .description('New Controller/Model/Types')
-  .action((itemName: string) => {
-    bootstrap(itemName);
-  });
+// program
+//   .command('new <itemName>')
+//   .alias('n')
+//   .option('-c --controller')
+//   .option('-m --model')
+//   .option('-t --type')
+//   .option('-d --dry-run')
+//   .description('New Controller/Model/Types')
+//   .action((itemName: string) => {
+//     bootstrap(itemName);
+//   });
 
 program.parse(process.argv);

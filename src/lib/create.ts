@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 
 import { filesToBuild } from './package';
-import { IBuildFile } from '../models/node';
+import { IBuildFile, IPackageAnswers } from '../models/node';
 import { Question } from 'inquirer';
 
 const currentDir: string = process.cwd();
@@ -9,21 +9,24 @@ const currentDir: string = process.cwd();
 const inqQuestions: Question[] = [
   {
     type: 'input',
-    name: 'Description',
-    message: 'Describe your project',
+    name: 'name',
+    message: `What is the author's name?`,
     default: ''
   },
   {
     type: 'input',
-    name: 'Name',
-    message: `What is the author's name?`,
-    default: ''
+    name: 'description',
+    message: 'Describe your project',
+    default: 'Node.js API with Typescript'
   }
 ];
 
 const srcChildren = ['config', 'controllers', 'models', 'public', 'types'];
 
-const bootstrap = (appName: string, answers?: any): Promise<string[]> => {
+const bootstrap = (
+  appName: string,
+  answers: IPackageAnswers
+): Promise<string[]> => {
   return new Promise(async (resolve, reject) => {
     const consoles: string[] = [];
     try {
@@ -31,7 +34,7 @@ const bootstrap = (appName: string, answers?: any): Promise<string[]> => {
       await Promise.all([
         createSrc(appName),
         createDir(appName, 'tests'),
-        createRootFiles(appName, filesToBuild)
+        createRootFiles(appName, filesToBuild, answers)
       ]).then(response => {
         response.forEach((results: string[] | string) => {
           if (typeof results === 'string') {
@@ -91,14 +94,18 @@ const createSrc = (appName: string): Promise<string[]> => {
 
 const createRootFiles = (
   path: string,
-  files: IBuildFile[]
+  files: IBuildFile[],
+  answers: IPackageAnswers
 ): Promise<string[]> => {
   return new Promise((resolve, reject) => {
     let consoles: string[] = [];
     try {
       files.forEach(async (file: IBuildFile) => {
-        consoles.push(await createJSONFile(path, file.name, file.content));
+        consoles.push(
+          await createJSONFile(path, file.name, file.content, answers)
+        );
       });
+      console.log(consoles);
       resolve(consoles);
     } catch (err) {
       reject(err);
@@ -152,12 +159,13 @@ const createFile = (path: string, fileName: string): Promise<string> => {
 const createJSONFile = (
   filePath: string,
   fileName: string,
-  fileFunc: any
+  fileFunc: Function,
+  answers: IPackageAnswers
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     fs.writeFile(
       `./${filePath}/${fileName}`,
-      JSON.stringify(fileFunc(filePath), null, '\t'),
+      JSON.stringify(fileFunc(filePath, answers), null, '\t'),
       err => {
         if (err) reject(err);
         resolve(`${filePath}/${fileName}`);
