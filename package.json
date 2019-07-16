@@ -20,10 +20,14 @@
     "@types/node": "^12.0.10",
     "chalk": "^2.4.2",
     "commander": "^2.20.0",
-    "inquirer": "^6.4.1"
+    "inquirer": "^6.4.1",
+    "log-symbols": "^3.0.0",
+    "simple-git": "^1.121.0"
   },
   "scripts": {
     "build": "tsc --outDir bin",
+    "clean": "rm -rf bin && rm -rf my-app",
+    "dev": "npm run clean && npm run build",
     "prepublish": "tsc --outDir bin"
   },
   "author": "Matt Mawhinney",

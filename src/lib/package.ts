@@ -1,7 +1,7 @@
 import { IPackage, ITSconfig } from '../models/node';
 
 const filesToBuild = [
-  { name: 'package.json', content: buildPackage },
+  // { name: 'package.json', content: buildPackage },
   { name: 'tslint.json', content: buildLinter },
   { name: 'tsconfig.json', content: buildConfig },
   { name: 'jest.config.js', content: buildJest }

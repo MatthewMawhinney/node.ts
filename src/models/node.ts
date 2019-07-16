@@ -13,3 +13,8 @@ export interface IPackage {
 export interface ITSconfig {
   compilerOptions: {};
 }
+
+export interface IBuildFile {
+  name: string;
+  content: Function;
+}
