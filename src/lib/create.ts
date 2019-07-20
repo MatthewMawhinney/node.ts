@@ -1,138 +1,153 @@
-import chalk from 'chalk';
 import * as fs from 'fs';
+
 import { filesToBuild } from './package';
+import { IBuildFile, IPackageAnswers } from '../models/node';
 import { Question } from 'inquirer';
 
 const currentDir: string = process.cwd();
-const errorLog: (message: string | any) => void = chalk.red.inverse;
-const successLog: (message: string) => void = chalk.green.bold;
 
 const inqQuestions: Question[] = [
   {
     type: 'input',
-    name: 'Description',
-    message: 'Describe your project',
+    name: 'name',
+    message: `What is the author's name?`,
     default: ''
   },
   {
     type: 'input',
-    name: 'Name',
-    message: `What is the author's name?`,
-    default: ''
+    name: 'description',
+    message: 'Describe your project',
+    default: 'Node.js API with Typescript'
   }
 ];
 
 const srcChildren = ['config', 'controllers', 'models', 'public', 'types'];
-let consolesToLog: string[] = [];
 
-/**
- * Function to successively create the directory structure for the application
- */
-function bootstrap(appName: string, answers?: any): void {
-  createRoot(appName)
-    .then((success: boolean) => {
-      consolesToLog.push(`${successLog('CREATED')}: ${appName}/`);
-      if (success) {
-        createSrc(appName).catch(err => {
-          consolesToLog = [`${errorLog('ERROR')}: ${err}`];
-          deleteDir(appName, 'src');
-        });
-        createDir(appName, 'tests')
-          .then((success: boolean) => {
-            consolesToLog.push(`${successLog('CREATED')}: ${appName}/tests`);
-          })
-          .catch(err => {
-            consolesToLog = [`${errorLog('ERROR')}: ${err}`];
-            deleteDir(appName, 'tests');
-          });
-        filesToBuild.forEach(file => {
-          createJSONFile(appName, file.name, file.content)
-            .then(data => {
-              consolesToLog.push(`${successLog('CREATED')}: ${data}`);
-            })
-            .catch(err => {
-              consolesToLog = [`${errorLog('ERROR')}: ${err}`];
-              deleteFile(appName, file.name);
+const bootstrap = (
+  appName: string,
+  answers: IPackageAnswers
+): Promise<string[]> => {
+  return new Promise(async (resolve, reject) => {
+    const consoles: string[] = [];
+    try {
+      await Promise.all([
+        createDir(appName, 'src'),
+        createDir(appName, 'tests'),
+        createFile(appName, 'dist/ \n node_modules/ \n .env', '.gitignore'),
+        createFile(appName, '', '.env'),
+        createChildrenDir(`${appName}/src`, srcChildren),
+        createRootFiles(appName, filesToBuild, answers)
+      ]).then(response => {
+        response.forEach((results: string[] | string) => {
+          if (typeof results === 'string') {
+            consoles.push(results);
+          } else {
+            results.forEach((result: string) => {
+              consoles.push(result);
             });
+          }
         });
-      }
-    })
-    .catch(err => {
-      consolesToLog = [`${errorLog('ERROR')}: ${err}`];
-      deleteDir('', appName);
-    })
-    .finally(() => {
-      consolesToLog.forEach(consoleLog => {
-        console.log(consoleLog);
       });
-    });
-}
-
-/**
- * Create root folder for the Node.ts API
- * @param appName name of application root folder
- */
-const createRoot = (appName: string): Promise<any> => {
-  return new Promise((resolve, reject) => {
-    if (!fs.existsSync(appName)) {
-      fs.mkdir(appName, null, err => {
-        if (err) return reject(err);
-        resolve(true);
-      });
-    } else {
-      return reject(`${appName}/ already exists in ${currentDir}`);
+      resolve(consoles);
+    } catch (err) {
+      reject(err);
     }
   });
 };
 
 /**
- * Deletes directory if any actions are unsuccessful
- * @param appName name application root
- * @param directoryName name of directory to delete
+ * Create root folder for the Node.ts API
+ * @param appName name of application root folder
  */
-const deleteDir = (path: string, directory: string): void => {
-  fs.rmdir(`./${path}/${directory}`, err => {
-    if (err)
-      consolesToLog = [
-        `${errorLog(
-          'ERROR'
-        )}: Could not delete directory ${path}/${directory}: ${err}`
-      ];
+const createRootDir = (appName: string): Promise<string> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!fs.existsSync(appName)) {
+        resolve(await createDir(appName));
+      } else {
+        reject(`${appName}/ already exists in ${currentDir}`);
+      }
+    } catch (err) {
+      reject(err);
+    }
   });
 };
 
 /**
- * Function that creates directories
- * Returns a Promise<boolean> to indicate whether success and to continue...
- * @param appName The name passed to the create command
- * @param dryRun optional command argument to run command as test only
+ * Create the source directory and all the child dir and files
+ * @param appName name application root
+ * @param directory name
  */
-const createDir = (
-  appName?: string,
-  directoryName?: string
-): Promise<boolean> => {
-  return new Promise((resolve, reject) => {
-    fs.mkdir(`./${appName}/${directoryName}`, null, err => {
-      if (err) return reject(err);
-      resolve(true);
-    });
+const createChildrenDir = (
+  parentDirPath: string,
+  dirToCreate: string[]
+): Promise<string[]> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const consoles: string[] = await processDirectoryArray(
+        parentDirPath,
+        dirToCreate
+      );
+      resolve(consoles);
+    } catch (err) {
+      reject(err);
+    }
   });
 };
 
 /**
- * Function to delete files
- * @param appName name application root
- * @param fileName name of file to delete
+ * Function to create directories from array of strings
+ * @param path location to create directories inside
+ * @param array array of dir names
  */
-const deleteFile = (appName: string, fileName: string): void => {
-  fs.unlink(`./${appName}/${fileName}`, err => {
-    if (err)
-      consolesToLog = [
-        `${errorLog(
-          'ERROR'
-        )}: Could not delete file ${appName}/${fileName}: ${err}`
-      ];
+const processDirectoryArray = async (
+  path: string,
+  array: any[]
+): Promise<string[]> => {
+  const promises = array.map((dir: string) => createDir(path, dir));
+  return await Promise.all(promises);
+};
+
+/**
+ * Function to create root JSON files eg. Package.json, Jest.config.js...
+ * @param path path to parent directory
+ * @param files array of @IBuildFile to create files from
+ * @param answers answers from inquirer to populate package.json with
+ */
+const createRootFiles = (
+  path: string,
+  files: IBuildFile[],
+  answers: IPackageAnswers
+): Promise<string[]> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const consoles: string[] = await processJSONFileArray(
+        path,
+        files,
+        answers
+      );
+      resolve(consoles);
+    } catch (err) {
+      reject(err);
+    }
   });
+};
+
+/**
+ * Function used to create multiple JSON files at once
+ * @param path location to create files in
+ * @param array array of files to build
+ * @param answers answers used to populate files
+ */
+const processJSONFileArray = async (
+  path: string,
+  array: any[],
+  answers: IPackageAnswers
+): Promise<string[]> => {
+  const promises = array.map((file: IBuildFile) =>
+    createJSONFile(path, file.name, file.content, answers)
+  );
+  return await Promise.all(promises);
 };
 
 /**
@@ -144,51 +159,88 @@ const deleteFile = (appName: string, fileName: string): void => {
  * @param config optional parameter if function is a tsconfig file
  */
 const createJSONFile = (
-  appName: string,
+  filePath: string,
   fileName: string,
-  fileFunc: any
-): Promise<any> => {
+  fileFunc: (file: string, answers: IPackageAnswers) => any,
+  answers: IPackageAnswers
+): Promise<string> => {
   return new Promise((resolve, reject) => {
     fs.writeFile(
-      `./${appName}/${fileName}`,
-      JSON.stringify(fileFunc(appName), null, '\t'),
+      `./${filePath}/${fileName}`,
+      JSON.stringify(fileFunc(filePath, answers), null, '\t'),
       err => {
         if (err) reject(err);
-        resolve(`${appName}/${fileName}`);
+        resolve(`${filePath}/${fileName}`);
       }
     );
   });
 };
 
 /**
- * Create the source directory and all the child dir and files
- * @param appName name application root
- * @param directory name
+ * Function that creates directories
+ * Returns a Promise<boolean> to indicate whether success and to continue...
+ * @param appName The name passed to the create command
+ * @param dryRun optional command argument to run command as test only
  */
-const createSrc = (appName: string): Promise<boolean> => {
+const createDir = (path: string, directoryName?: string): Promise<string> => {
   return new Promise((resolve, reject) => {
-    createDir(appName, 'src').then((success: boolean) => {
-      console.log(`${successLog('CREATED')}: ${appName}/src`);
-      srcChildren.forEach(dir => {
-        createDir(`${appName}/src`, dir)
-          .then(() => {
-            consolesToLog.push(
-              `${successLog('CREATED')}: ${appName}/src/${dir}`
-            );
-          })
-          .catch(err => {
-            reject(err);
-          });
-      });
-      fs.writeFile(`./${appName}/src/server.ts`, null, err => {
-        if (err) reject(err);
-        consolesToLog.push(
-          `${successLog('CREATED')}: ${appName}/src/server.ts`
-        );
-        resolve(true);
-      });
+    let filePath: string;
+    if (directoryName) {
+      filePath = `${path}/${directoryName}`;
+    } else {
+      filePath = `${path}`;
+    }
+    fs.mkdir(`./${filePath}`, null, err => {
+      if (err) return reject(err);
+      resolve(filePath);
     });
   });
 };
 
-export { bootstrap, inqQuestions };
+/**
+ * Function to create individual files
+ * @param path path to location for file
+ * @param fileName name of file to be created at @path
+ */
+const createFile = (
+  path: string,
+  content: string | {},
+  fileName: string
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(`./${path}/${fileName}`, content, err => {
+      if (err) reject(err);
+      resolve(`${path}/${fileName}`);
+    });
+  });
+};
+
+/**
+ * Deletes directory if any actions are unsuccessful
+ * @param appName name application root
+ * @param directoryName name of directory to delete
+ */
+const deleteDir = (path: string, directory: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    fs.rmdir(`./${path}/${directory}`, err => {
+      if (err) reject(err);
+      resolve(`${path}/${directory}`);
+    });
+  });
+};
+
+/**
+ * Function to delete files
+ * @param appName name application root
+ * @param fileName name of file to delete
+ */
+const deleteFile = (path: string, fileName: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    fs.unlink(`./${path}/${fileName}`, err => {
+      if (err) reject(err);
+      resolve(`${path}/${fileName}`);
+    });
+  });
+};
+
+export { bootstrap, createRootDir, inqQuestions };

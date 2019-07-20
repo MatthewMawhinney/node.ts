@@ -1,38 +1,38 @@
-import { IPackage, ITSconfig } from '../models/node';
+import { IPackage, IPackageAnswers } from '../models/node';
 
 const filesToBuild = [
   { name: 'package.json', content: buildPackage },
+  { name: 'package-lock.json', content: () => '' },
   { name: 'tslint.json', content: buildLinter },
-  { name: 'tsconfig.json', content: buildConfig },
   { name: 'jest.config.js', content: buildJest }
 ];
 
-function buildPackage(appName: string): IPackage {
+function buildPackage(appName: string, answers: IPackageAnswers): IPackage {
   return {
     name: appName,
     version: '1.0.0',
-    description: '',
-    main: 'index.js',
-    dependencies: {},
-    devDependencies: {},
-    scripts: {},
-    author: '',
-    license: ''
+    description: answers.description,
+    main: 'src/index.js',
+    dependencies: {
+      'ts-node': '^8.3.0',
+      typescript: '^3.5.2'
+    },
+    devDependencies: {
+      '@types/node': '^12.0.10'
+    },
+    scripts: {
+      build: 'tsc --outDir dist'
+    },
+    repository: {
+      type: 'git',
+      url: ''
+    },
+    author: answers.name,
+    license: 'MIT'
   };
 }
 
-function buildConfig(appName: string): ITSconfig {
-  return {
-    compilerOptions: {
-      target: 'es5',
-      module: 'commonjs',
-      outDir: './dist',
-      strict: true
-    }
-  };
-}
-
-function buildLinter(appName: string): any {
+function buildLinter(appName: string, answers: IPackageAnswers): any {
   return {
     defaultSeverity: 'error',
     extends: ['tslint:recommended'],
@@ -44,7 +44,7 @@ function buildLinter(appName: string): any {
   };
 }
 
-function buildJest(): any {
+function buildJest(appName: string, answers: IPackageAnswers): any {
   return {};
 }
 
