@@ -2,6 +2,7 @@ import { IPackage, IPackageAnswers } from '../models/node';
 
 const filesToBuild = [
   { name: 'package.json', content: buildPackage },
+  { name: 'package-lock.json', content: () => '' },
   { name: 'tslint.json', content: buildLinter },
   { name: 'jest.config.js', content: buildJest }
 ];
@@ -22,12 +23,16 @@ function buildPackage(appName: string, answers: IPackageAnswers): IPackage {
     scripts: {
       build: 'tsc --outDir dist'
     },
+    repository: {
+      type: 'git',
+      url: ''
+    },
     author: answers.name,
     license: 'MIT'
   };
 }
 
-function buildLinter(appName: string, answers: string[]): any {
+function buildLinter(appName: string, answers: IPackageAnswers): any {
   return {
     defaultSeverity: 'error',
     extends: ['tslint:recommended'],
@@ -39,7 +44,7 @@ function buildLinter(appName: string, answers: string[]): any {
   };
 }
 
-function buildJest(appName: string, answers: string[]): any {
+function buildJest(appName: string, answers: IPackageAnswers): any {
   return {};
 }
 

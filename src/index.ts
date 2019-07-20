@@ -4,43 +4,53 @@ import program from 'commander';
 import inquirer from 'inquirer';
 import logSymbols from 'log-symbols';
 import chalk from 'chalk';
-import simplegit from 'simple-git/promise';
-import spawn from 'cross-spawn';
+import ora from 'ora';
+import del from 'del';
 
-import { bootstrap, inqQuestions } from './lib/create';
+import { bootstrap, createRootDir, inqQuestions } from './lib/create';
+import { spawnProcess, gitInitProcess } from './lib/child-process';
 
 const errorLog: (message: string | any) => void = chalk.red.inverse;
 const successLog: (message: string) => void = chalk.green.bold;
 
 program
-  .command('create <projectName>')
-  .alias('cr')
+  .command('new <projectName>')
+  .alias('n')
   .description('Create a new node.ts project')
   .action((projectName: string, options) => {
-    inquirer.prompt(inqQuestions).then(async (answers: any) => {
-      try {
-        let consoles = await bootstrap(projectName, answers);
-        consoles.forEach(resultToConsole => {
-          console.log(
-            `${logSymbols.success} ${successLog('CREATED')}: ${resultToConsole}`
-          );
+    inquirer.prompt(inqQuestions).then((answers: any) => {
+      createRootDir(projectName)
+        .then(async rootDir => {
+          try {
+            const filesCreated = await bootstrap(projectName, answers);
+            filesCreated.forEach(file => {
+              console.log(
+                `${logSymbols.success} ${successLog('CREATED')} ${file}`
+              );
+            });
+
+            const spinner = ora(`${chalk.blue('Creating Project')}`).start();
+
+            spinner.text = `${chalk.blue('Initializing Typescript')}`;
+            spinner.succeed(await spawnProcess(projectName, 'tsc', ['--init']));
+
+            spinner.text = `${chalk.blue('Installing Dependencies')}`;
+            spinner.succeed(await spawnProcess(projectName, 'npm', ['i']));
+
+            spinner.text = `${chalk.blue('Initializing Git')}`;
+            spinner.succeed(await gitInitProcess(projectName));
+
+            spinner.stop();
+          } catch (err) {
+            console.error(`${logSymbols.error} ${errorLog('ERROR')} ${err}`);
+            await del(`./${projectName}`);
+            process.exit(1);
+          }
+        })
+        .catch(err => {
+          console.error(`${logSymbols.error} ${errorLog('ERROR')} ${err}`);
+          process.exit(1);
         });
-        spawn.sync('tsc', ['--init'], {
-          stdio: 'inherit',
-          cwd: `./${projectName}`
-        });
-        let git = simplegit(`./${projectName}`);
-        await git
-          .outputHandler((command, stdout, stderr) => {
-            stdout.pipe(process.stdout);
-            stderr.pipe(process.stderr);
-          })
-          .init()
-          .then(() => git.add('./*'));
-        // .then(() => git.commit('Init commit'));
-      } catch (err) {
-        console.log(`${logSymbols.error} ${errorLog('ERROR')}: ${err}`);
-      }
     });
   });
 
@@ -55,5 +65,17 @@ program
 //   .action((itemName: string) => {
 //     bootstrap(itemName);
 //   });
+
+/**
+ * Command to catch all invalid commands and direct user to --help.
+ */
+program.on('command:*', () => {
+  console.error(
+    `${logSymbols.error} ${errorLog(
+      'ERROR'
+    )} Invalid Command: See --help to see the list of available commands.`
+  );
+  process.exit(1);
+});
 
 program.parse(process.argv);

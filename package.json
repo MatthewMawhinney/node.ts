@@ -11,6 +11,7 @@
     "access": "public"
   },
   "dependencies": {
+    "ora": "^3.4.0",
     "ts-node": "^8.3.0",
     "typescript": "^3.5.2"
   },
@@ -29,7 +30,8 @@
     "build": "tsc --outDir bin",
     "clean": "rm -rf bin",
     "dev": "npm run clean && npm run build && npm link",
-    "prepublish": "tsc --outDir bin"
+    "prepare": "tsc --outDir bin",
+    "prepublishOnly": "tsc --outDir bin"
   },
   "author": "Matt Mawhinney",
   "license": "MIT"

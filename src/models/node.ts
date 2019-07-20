@@ -5,6 +5,7 @@ export interface IPackage {
   main: string;
   dependencies: {};
   devDependencies: {};
+  repository: {};
   scripts: {};
   author: string;
   license: string;
@@ -12,7 +13,7 @@ export interface IPackage {
 
 export interface IBuildFile {
   name: string;
-  content: Function;
+  content: (file: string, answers: IPackageAnswers) => any;
 }
 
 export interface IPackageAnswers {

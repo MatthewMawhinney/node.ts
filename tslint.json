@@ -11,7 +11,8 @@
     "trailing-comma": false,
     "arrow-parens": false,
     "object-literal-sort-keys": false,
-    "ordered-imports": false
+    "ordered-imports": false,
+    "curly": false
   },
   "rulesDirectory": []
 }
