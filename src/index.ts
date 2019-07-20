@@ -7,7 +7,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 import del from 'del';
 
-import { bootstrap, createRootDir, inqQuestions } from './lib/create';
+import { bootstrap, createRootDir, inqQuestions } from './lib/new';
 import { spawnProcess, gitInitProcess } from './lib/child-process';
 
 const errorLog: (message: string | any) => void = chalk.red.inverse;
@@ -24,9 +24,7 @@ program
           try {
             const filesCreated = await bootstrap(projectName, answers);
             filesCreated.forEach(file => {
-              console.log(
-                `${logSymbols.success} ${successLog('CREATED')} ${file}`
-              );
+              console.log(`${logSymbols.success} ${successLog('CREATED')} ${file}`);
             });
 
             const spinner = ora(`${chalk.blue('Creating Project')}`).start();
@@ -70,11 +68,7 @@ program
  * Command to catch all invalid commands and direct user to --help.
  */
 program.on('command:*', () => {
-  console.error(
-    `${logSymbols.error} ${errorLog(
-      'ERROR'
-    )} Invalid Command: See --help to see the list of available commands.`
-  );
+  console.error(`${logSymbols.error} ${errorLog('ERROR')} Invalid Command: See --help to see the list of available commands.`);
   process.exit(1);
 });
 

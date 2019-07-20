@@ -11,14 +11,12 @@
     "access": "public"
   },
   "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
     "ora": "^3.4.0",
+    "shelljs": "^0.8.3",
     "ts-node": "^8.3.0",
-    "typescript": "^3.5.2"
-  },
-  "devDependencies": {
-    "@types/cross-spawn": "^6.0.0",
-    "@types/inquirer": "^6.0.3",
-    "@types/node": "^12.0.10",
+    "typescript": "^3.5.2",
     "chalk": "^2.4.2",
     "commander": "^2.20.0",
     "cross-spawn": "^6.0.5",
@@ -26,12 +24,18 @@
     "log-symbols": "^3.0.0",
     "simple-git": "^1.121.0"
   },
+  "devDependencies": {
+    "@types/cross-spawn": "^6.0.0",
+    "@types/inquirer": "^6.0.3",
+    "@types/node": "^12.0.10",
+    "@types/shelljs": "^0.8.5",
+    "@types/express": "^4.17.0"
+  },
   "scripts": {
-    "build": "tsc --outDir bin",
+    "build": "tsc",
     "clean": "rm -rf bin",
-    "dev": "npm run clean && npm run build && npm link",
-    "prepare": "tsc --outDir bin",
-    "prepublishOnly": "tsc --outDir bin"
+    "assets": "node static.js",
+    "dev": "npm run clean && npm run build && npm run assets && npm link"
   },
   "author": "Matt Mawhinney",
   "license": "MIT"

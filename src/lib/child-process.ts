@@ -7,11 +7,7 @@ import simplegit from 'simple-git/promise';
  * @param command The shell command to run.
  * @param args An array of string arguments for the command.
  */
-const spawnProcess = (
-  appRoot: string,
-  command: string,
-  args: string[]
-): Promise<string> => {
+const spawnProcess = (appRoot: string, command: string, args: string[]): Promise<string> => {
   return new Promise(async (resolve, reject) => {
     try {
       const spawnOutput = await spawn(command, args, {
