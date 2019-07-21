@@ -13,11 +13,16 @@ import { spawnProcess, gitInitProcess } from './lib/child-process';
 const errorLog: (message: string | any) => void = chalk.red.inverse;
 const successLog: (message: string) => void = chalk.green.bold;
 
+program.version('0.1.0', '-v, --version');
+
+/**
+ * Command to bootstrap new Node.ts project
+ */
 program
   .command('new <projectName>')
   .alias('n')
   .description('Create a new node.ts project')
-  .action((projectName: string, options) => {
+  .action((projectName: string) => {
     inquirer.prompt(inqQuestions).then((answers: any) => {
       createRootDir(projectName)
         .then(async rootDir => {
@@ -52,17 +57,19 @@ program
     });
   });
 
-// program
-//   .command('new <itemName>')
-//   .alias('n')
-//   .option('-c --controller')
-//   .option('-m --model')
-//   .option('-t --type')
-//   .option('-d --dry-run')
-//   .description('New Controller/Model/Types')
-//   .action((itemName: string) => {
-//     bootstrap(itemName);
-//   });
+/**
+ * Command to add new controllers or models to your API.
+ * Pass the name along with either flag to create the model/controller in the current working directory.
+ */
+program
+  .command('add <itemName>')
+  .alias('a')
+  .option('-c --controller')
+  .option('-m --model')
+  .description('Add a new Controller/Model in your cwd')
+  .action((itemName: string, options) => {
+    console.log(itemName, options.rawArgs.slice(2));
+  });
 
 /**
  * Command to catch all invalid commands and direct user to --help.

@@ -35,7 +35,7 @@
     "build": "tsc",
     "clean": "rm -rf bin",
     "assets": "node static.js",
-    "dev": "npm run clean && npm run build && npm run assets && npm link"
+    "dev": "npm run clean && npm run build && npm run assets"
   },
   "author": "Matt Mawhinney",
   "license": "MIT"

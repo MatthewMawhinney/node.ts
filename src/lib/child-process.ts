@@ -1,3 +1,4 @@
+import path from 'path';
 import spawn from 'cross-spawn';
 import simplegit from 'simple-git/promise';
 
@@ -25,7 +26,7 @@ const spawnProcess = (appRoot: string, command: string, args: string[]): Promise
 const gitInitProcess = (appRoot: string): Promise<string> => {
   return new Promise(async (resolve, reject) => {
     let result: string = '';
-    const git = simplegit(`./${appRoot}`);
+    const git = simplegit(path.join('./', appRoot));
     try {
       await git
         .outputHandler((command, stdout, stderr) => {

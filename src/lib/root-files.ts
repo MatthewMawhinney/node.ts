@@ -19,10 +19,10 @@ const buildPackage = (appName: string, answers: IPackageAnswers): IPackage => {
       '@types/express': '^4.17.0'
     },
     scripts: {
-      'serve': 'npm run build && node dist/server.js',
+      'serve': 'npm run build && node dist/src/server.js',
       'build': 'npm run build-ts && npm run copy-static-assets',
       'build-ts': 'tsc --outDir dist',
-      'copy-static-assets': 'ts-node copyStaticAssets.ts'
+      'copy-static-assets': 'ts-node staticAssets.ts'
     },
     repository: {
       type: 'git',
