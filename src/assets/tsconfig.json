@@ -5,9 +5,9 @@
     "lib": ["es2017", "es7", "es6", "dom"],
     "strict": true,
     "declaration": true,
-    "outDir": "./bin",
+    "outDir": "./dist",
     "esModuleInterop": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "src/assets/*", "**/*/spec.ts"]
+  "exclude": ["node_modules", "src/public/**/*", "**/*/spec.ts"]
 }

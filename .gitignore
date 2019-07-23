@@ -1,6 +1,5 @@
 dist/
 bin/
-my-app/
 node_modules/
 package-lock.json
 .prettierrc

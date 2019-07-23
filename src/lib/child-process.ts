@@ -1,3 +1,4 @@
+import path from 'path';
 import spawn from 'cross-spawn';
 import simplegit from 'simple-git/promise';
 
@@ -7,11 +8,7 @@ import simplegit from 'simple-git/promise';
  * @param command The shell command to run.
  * @param args An array of string arguments for the command.
  */
-const spawnProcess = (
-  appRoot: string,
-  command: string,
-  args: string[]
-): Promise<string> => {
+const spawnProcess = (appRoot: string, command: string, args: string[]): Promise<string> => {
   return new Promise(async (resolve, reject) => {
     try {
       const spawnOutput = await spawn(command, args, {
@@ -29,7 +26,7 @@ const spawnProcess = (
 const gitInitProcess = (appRoot: string): Promise<string> => {
   return new Promise(async (resolve, reject) => {
     let result: string = '';
-    const git = simplegit(`./${appRoot}`);
+    const git = simplegit(path.join('./', appRoot));
     try {
       await git
         .outputHandler((command, stdout, stderr) => {
@@ -38,7 +35,7 @@ const gitInitProcess = (appRoot: string): Promise<string> => {
           });
         })
         .init()
-        .then(() => git.add('./*'))
+        .then(() => git.add(path.join('.', '*')))
         .then(() => {
           git.commit('Init Node.ts Commit!');
           resolve(result);
