@@ -1,4 +1,4 @@
-![alt-text](./src/assets/node.ts.png)
+![alt-text](./src/assets/node-ts.png)
 
 A Node CLI for generating Node.js API using Typescript and Express.
 
