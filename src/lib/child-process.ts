@@ -35,7 +35,7 @@ const gitInitProcess = (appRoot: string): Promise<string> => {
           });
         })
         .init()
-        .then(() => git.add('./*'))
+        .then(() => git.add(path.join('.', '*')))
         .then(() => {
           git.commit('Init Node.ts Commit!');
           resolve(result);

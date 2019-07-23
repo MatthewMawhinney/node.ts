@@ -23,19 +23,19 @@ program
   .alias('n')
   .description('Create a new node.ts project')
   .action((projectName: string) => {
+    console.log('');
     inquirer.prompt(inqQuestions).then((answers: any) => {
       createRootDir(projectName)
         .then(async rootDir => {
           try {
             const filesCreated = await bootstrap(projectName, answers);
+            console.log('');
             filesCreated.forEach(file => {
               console.log(`${logSymbols.success} ${successLog('CREATED')} ${file}`);
             });
+            console.log('');
 
             const spinner = ora(`${chalk.blue('Creating Project')}`).start();
-
-            spinner.text = `${chalk.blue('Initializing Typescript')}`;
-            spinner.succeed(await spawnProcess(projectName, 'tsc', ['--init']));
 
             spinner.text = `${chalk.blue('Installing Dependencies')}`;
             spinner.succeed(await spawnProcess(projectName, 'npm', ['i']));
@@ -44,9 +44,14 @@ program
             spinner.succeed(await gitInitProcess(projectName));
 
             spinner.stop();
+
+            console.log(
+              ' \u{1F389} ',
+              chalk.blue.bold(`${projectName} created successfully! Run 'npm run serve' inside ${projectName} to start your first server.`)
+            );
           } catch (err) {
             console.error(`${logSymbols.error} ${errorLog('ERROR')} ${err}`);
-            await del(`./${projectName}`);
+            await del(projectName);
             process.exit(1);
           }
         })
@@ -60,6 +65,7 @@ program
 /**
  * Command to add new controllers or models to your API.
  * Pass the name along with either flag to create the model/controller in the current working directory.
+ * Will be implemented in 0.2.0...
  */
 program
   .command('add <itemName>')
@@ -68,7 +74,7 @@ program
   .option('-m --model')
   .description('Add a new Controller/Model in your cwd')
   .action((itemName: string, options) => {
-    console.log(itemName, options.rawArgs.slice(2));
+    console.log(itemName, 'This command has not yet been implemented, will be added in 0.2.0');
   });
 
 /**

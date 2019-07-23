@@ -24,6 +24,15 @@ const inqQuestions: Question[] = [
 
 const srcChildren = ['config', 'controllers', 'models', 'public', 'types'];
 const publicChildren = ['js', 'fonts', 'images'];
+const staticAssets = [
+  { file: 'server.ts', dest: path.join('src', 'server.ts') },
+  { file: 'app.ts', dest: path.join('src', 'app.ts') },
+  { file: 'staticAssets.ts', dest: 'staticAssets.ts' },
+  { file: 'index.html', dest: path.join('src', 'public', 'index.html') },
+  { file: 'tsconfig.json', dest: 'tsconfig.json' },
+  { file: 'jest.config.js', dest: 'jest.config.js' },
+  { file: 'node-ts.png', dest: path.join('src', 'public', 'images', 'node-ts.png') }
+];
 
 const bootstrap = (appName: string, answers: IPackageAnswers): Promise<string[]> => {
   return new Promise(async (resolve, reject) => {
@@ -31,16 +40,13 @@ const bootstrap = (appName: string, answers: IPackageAnswers): Promise<string[]>
     try {
       await Promise.all([
         createDir(appName, 'src'),
-        createDir(appName, 'tests'),
+        createDir(appName, '__tests__'),
         createFile(appName, 'dist/\nnode_modules/ \n.env', '.gitignore'),
-        // createFile(appName, '', '.env'),
+        createFile(appName, '', '.env'),
         createChildrenDir(path.join(appName, 'src'), srcChildren),
         createChildrenDir(path.join(appName, 'src', 'public'), publicChildren),
         createRootFiles(appName, filesToBuild, answers),
-        copyFile(path.join(__dirname, '..', 'static', 'server.ts'), path.join(currentDir, appName, 'src', 'server.ts')),
-        copyFile(path.join(__dirname, '..', 'static', 'app.ts'), path.join(currentDir, appName, 'src', 'app.ts')),
-        copyFile(path.join(__dirname, '..', 'static', 'staticAssets.ts'), path.join(currentDir, appName, 'staticAssets.ts')),
-        copyFile(path.join(__dirname, '..', 'static', 'index.html'), path.join(currentDir, appName, 'src', 'public', 'index.html'))
+        copyStaticBatch(appName)
       ]).then(response => {
         response.forEach((results: string[] | string) => {
           if (typeof results === 'string') {
@@ -132,6 +138,17 @@ const processJSONFileArray = async (filePath: string, array: any[], answers: IPa
 };
 
 /**
+ * Function that copies static assets to the new project.
+ * @param appName appName used in the destination path
+ */
+const copyStaticBatch = async (appName: string) => {
+  const promises = staticAssets.map((asset: any) => {
+    return copyFile(path.join(__dirname, '..', 'static', asset.file), path.join(currentDir, appName, asset.dest));
+  });
+  return await Promise.all(promises);
+};
+
+/**
  * Generic-ish function to create .json files, returns a promise
  * when file has been created or an error occurs.
  * @param path path to create the jsonfiles
@@ -146,9 +163,9 @@ const createJSONFile = (
   answers: IPackageAnswers
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
-    fs.writeFile(path.join('./', filePath, fileName), JSON.stringify(fileFunc(filePath, answers), null, '\t'), err => {
+    fs.writeFile(path.join('.', filePath, fileName), JSON.stringify(fileFunc(filePath, answers), null, '\t'), err => {
       if (err) reject(err);
-      resolve(`${filePath}/${fileName}`);
+      resolve(path.join(filePath, fileName));
     });
   });
 };
@@ -167,7 +184,7 @@ const createDir = (filePath: string, directoryName?: string): Promise<string> =>
     } else {
       filePathConcat = filePath;
     }
-    fs.mkdir(path.join('./', filePathConcat), null, err => {
+    fs.mkdir(path.join('.', filePathConcat), null, err => {
       if (err) return reject(err);
       resolve(filePathConcat);
     });
@@ -181,9 +198,9 @@ const createDir = (filePath: string, directoryName?: string): Promise<string> =>
  */
 const createFile = (filePath: string, content: string | {}, fileName: string): Promise<string> => {
   return new Promise((resolve, reject) => {
-    fs.writeFile(path.join('./', filePath, fileName), content, err => {
+    fs.writeFile(path.join('.', filePath, fileName), content, err => {
       if (err) reject(err);
-      resolve(`${filePath}/${fileName}`);
+      resolve(path.join(filePath, fileName));
     });
   });
 };
@@ -209,9 +226,9 @@ const copyFile = (filePath: string, destinationPath: string): Promise<string> =>
  */
 const deleteDir = (filePath: string, directory: string): Promise<string> => {
   return new Promise((resolve, reject) => {
-    fs.rmdir(path.join('./', filePath, directory), err => {
+    fs.rmdir(path.join('.', filePath, directory), err => {
       if (err) reject(err);
-      resolve(`${filePath}/${directory}`);
+      resolve(path.join(filePath, directory));
     });
   });
 };
@@ -223,9 +240,9 @@ const deleteDir = (filePath: string, directory: string): Promise<string> => {
  */
 const deleteFile = (filePath: string, fileName: string): Promise<string> => {
   return new Promise((resolve, reject) => {
-    fs.unlink(path.join('./', filePath, fileName), err => {
+    fs.unlink(path.join('.', filePath, fileName), err => {
       if (err) reject(err);
-      resolve(`${filePath}/${fileName}`);
+      resolve(path.join(filePath, fileName));
     });
   });
 };

@@ -5,10 +5,7 @@ const buildPackage = (appName: string, answers: IPackageAnswers): IPackage => {
     name: appName,
     version: '1.0.0',
     description: answers.description,
-    main: 'src/index.js',
     dependencies: {
-      'ts-node': '^8.3.0',
-      'typescript': '^3.5.2',
       'body-parser': '^1.19.0',
       'express': '^4.17.1',
       'shelljs': '^0.8.3'
@@ -16,13 +13,18 @@ const buildPackage = (appName: string, answers: IPackageAnswers): IPackage => {
     devDependencies: {
       '@types/node': '^12.0.10',
       '@types/shelljs': '^0.8.5',
-      '@types/express': '^4.17.0'
+      '@types/express': '^4.17.0',
+      '@types/jest': '^24.0.15',
+      'ts-jest': '^24.0.2',
+      'ts-node': '^8.3.0',
+      'typescript': '^3.5.2',
+      'jest': '^24.8.0'
     },
     scripts: {
-      'serve': 'npm run build && node dist/src/server.js',
-      'build': 'npm run build-ts && npm run copy-static-assets',
-      'build-ts': 'tsc --outDir dist',
-      'copy-static-assets': 'ts-node staticAssets.ts'
+      'serve': 'npm run build && node dist/server.js',
+      'build': 'rm -rf dist && tsc && npm run copy-static-assets',
+      'copy-static-assets': 'ts-node staticAssets.ts',
+      'test': 'jest'
     },
     repository: {
       type: 'git',
@@ -54,14 +56,6 @@ const buildLinter = (appName: string, answers: IPackageAnswers): any => {
   };
 };
 
-const buildJest = (appName: string, answers: IPackageAnswers): any => {
-  return {};
-};
-
-const filesToBuild = [
-  { name: 'package.json', content: buildPackage },
-  { name: 'tslint.json', content: buildLinter },
-  { name: 'jest.config.js', content: buildJest }
-];
+const filesToBuild = [{ name: 'package.json', content: buildPackage }, { name: 'tslint.json', content: buildLinter }];
 
 export { filesToBuild };

@@ -1,3 +1,3 @@
 import * as shell from 'shelljs';
 
-shell.cp('-R', 'src/public/', 'dist/src/public');
+shell.cp('-R', 'src/public/', 'dist/public');
