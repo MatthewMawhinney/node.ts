@@ -30,6 +30,7 @@ const staticAssets = [
   { file: 'staticAssets.ts', dest: 'staticAssets.ts' },
   { file: 'index.html', dest: path.join('src', 'public', 'index.html') },
   { file: 'tsconfig.json', dest: 'tsconfig.json' },
+  { file: 'README.md', dest: 'README.md' },
   { file: 'jest.config.js', dest: 'jest.config.js' },
   { file: 'node-ts.png', dest: path.join('src', 'public', 'images', 'node-ts.png') }
 ];
