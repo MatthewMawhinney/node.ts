@@ -1,21 +1,26 @@
 {
   "name": "node.ts",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A Node.js framework for creating Node APIs with Typescript and Express",
   "main": "./bin/index.js",
   "types": "./bin/index.d.ts",
   "bin": {
     "node.ts": "./bin/index.js"
   },
+  "files": [
+    "bin/**/*"
+  ],
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mmwny/node.ts"
+  },
   "dependencies": {
-    "body-parser": "^1.19.0",
     "chalk": "^2.4.2",
     "commander": "^2.20.0",
     "cross-spawn": "^6.0.5",
-    "express": "^4.17.1",
     "inquirer": "^6.4.1",
     "log-symbols": "^3.0.0",
     "ora": "^3.4.0",
@@ -24,7 +29,6 @@
   },
   "devDependencies": {
     "@types/cross-spawn": "^6.0.0",
-    "@types/express": "^4.17.0",
     "@types/inquirer": "^6.0.3",
     "@types/jest": "^24.0.15",
     "@types/node": "^12.0.10",
@@ -33,15 +37,29 @@
     "rimraf": "^2.6.3",
     "ts-jest": "^24.0.2",
     "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
     "typescript": "^3.5.2"
   },
   "scripts": {
+    "prepare": "npm run dev",
+    "prepublishOnly": "npm run test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "git add -A .",
+    "postversion": "git push && git push --tags",
+    "test": "jest --config jest.config.js",
+    "lint": "tslint -p tsconfig.json",
     "build": "tsc",
-    "clean": "rimraf bin",
-    "assets": "node static.js",
-    "dev": "npm run clean && npm run build && npm run assets",
-    "test": "jest"
+    "dev": "rimraf bin && npm run build && node static.js"
   },
-  "author": "Matt Mawhinney",
+  "keywords": [
+    "Node.js",
+    "Typescript",
+    "Node.ts",
+    "Node",
+    "API",
+    "Server",
+    "CLI"
+  ],
+  "author": "Matt Mawhinney me@mattmawhinney.com (http://mattmawhinney.com)",
   "license": "MIT"
 }

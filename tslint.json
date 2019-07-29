@@ -7,8 +7,6 @@
     "no-console": false,
     "quotemark": [true, "single"],
     "no-var-requires": false,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
     "trailing-comma": false,
     "arrow-parens": false,
     "object-literal-sort-keys": false,
