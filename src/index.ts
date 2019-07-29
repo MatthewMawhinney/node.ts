@@ -13,7 +13,7 @@ import { spawnProcess, gitInitProcess } from './lib/child-process';
 const errorLog: (message: string | any) => void = chalk.red.inverse;
 const successLog: (message: string) => void = chalk.green.bold;
 
-program.version('0.1.0', '-v, --version');
+program.version('0.1.1', '-v, --version');
 
 /**
  * Command to bootstrap new Node.ts project
