@@ -1,5 +1,5 @@
 {
-  "name": "node.ts",
+  "name": "node.ts-cli",
   "version": "0.1.0",
   "description": "A Node.js framework for creating Node APIs with Typescript and Express",
   "main": "./bin/index.js",
